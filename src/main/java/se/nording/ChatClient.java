@@ -41,11 +41,9 @@ public class ChatClient {
 
     // Startchat
     void startChat() throws IOException {
-        String ipAddress = JOptionPane.showInputDialog(
-                chatWindow,
-                "Enter IP Address:",
-                "IP Address Required!",
-                JOptionPane.PLAIN_MESSAGE);
+        String ipAddress = JOptionPane.showInputDialog(chatWindow, "Enter IP Address:",
+                "IP Address Required!", JOptionPane.PLAIN_MESSAGE);
+
         Socket soc = new Socket(ipAddress, 9806);
         in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
         out = new PrintWriter(soc.getOutputStream(), true);
@@ -56,22 +54,19 @@ public class ChatClient {
                 break;
             }
             if (str.equals("NAMEREQUIRED")) {
-                String name = JOptionPane.showInputDialog(
-                        chatWindow,
-                        "Enter a unique name: ",
-                        "Name Required!",
-                        JOptionPane.PLAIN_MESSAGE);
+                String name = JOptionPane.showInputDialog(chatWindow, "Enter a unique name: ",
+                        "Name Required!", JOptionPane.PLAIN_MESSAGE);
                 out.println(name);
+
             } else if (str.equals("NAMEALREADYEXISTS")) {
-                String name = JOptionPane.showInputDialog(
-                        chatWindow,
-                        "Enter another name: ",
-                        "Name Already Exists!",
-                        JOptionPane.WARNING_MESSAGE);
+                String name = JOptionPane.showInputDialog(chatWindow, "Enter another name: ",
+                        "Name Already Exists!", JOptionPane.WARNING_MESSAGE);
                 out.println(name);
+
             } else if (str.startsWith("NAMEACCEPTED")) {  // Använder startsWith() här
                 textField.setEditable(true);
                 nameLabel.setText("You are logged in as: " + str.substring(12));
+
             } else {
                 chatArea.append(str + "\n");
             }

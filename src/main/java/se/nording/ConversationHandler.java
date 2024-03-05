@@ -4,15 +4,13 @@ import java.io.*;
 import java.net.Socket;
 
 public class ConversationHandler extends Thread {
-    final Socket socket;
-    String name;
-    PrintWriter pw;
+    private final Socket socket;
+    private String name;
+    private ChatLogger chatLogger;
 
-    public ConversationHandler(Socket socket) throws IOException {
+    public ConversationHandler(Socket socket, ChatLogger chatLogger) throws IOException {
         this.socket = socket;
-        FileWriter fw = new FileWriter("logs/ChatServer-Logs.txt", true);
-        BufferedWriter bw = new BufferedWriter(fw);
-        pw = new PrintWriter(bw, true);
+        this.chatLogger = chatLogger;
     }
 
     public void run() {
@@ -42,7 +40,7 @@ public class ConversationHandler extends Thread {
                 if (message == null) {
                     return;
                 }
-                pw.println(name + ": " + message);
+                chatLogger.logMessage(name + ": " + message);
 
                 for (PrintWriter writer : ChatServer.printWriters) {
                     writer.println(name + ": " + message);
