@@ -2,41 +2,48 @@ package se.nording;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.awt.event.ActionListener;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class ChatClient {
 
-    static JFrame chatWindow = new JFrame("Chat Application");
-    static JTextArea chatArea = new JTextArea(22, 40);
-    static JTextField textField = new JTextField(40);
-    static JLabel blankLabel = new JLabel("            ");
-    static JButton sendButton = new JButton("Send");
-    static BufferedReader in;
-    static PrintWriter out;
-    static JLabel nameLabel = new JLabel("        ");
-
+    private final JFrame chatWindow = new JFrame("Chat Application");
+    private final JTextArea chatArea = new JTextArea(22, 40);
+    private final JTextField textField = new JTextField(40);
+    private BufferedReader in;
+    private PrintWriter out;
+    private final JLabel nameLabel = new JLabel("        ");
+    
+    private final ActionListener sendAction = e -> {
+        String msg = textField.getText().trim();
+        if (!msg.isEmpty()) {
+            out.println(msg);
+            textField.setText("");
+        }
+    };
+    
     ChatClient() {
         chatWindow.setLayout(new FlowLayout());
 
         chatWindow.add(nameLabel);
         chatWindow.add(new JScrollPane(chatArea));
+        JLabel blankLabel = new JLabel("            ");
         chatWindow.add(blankLabel);
         chatWindow.add(textField);
+        JButton sendButton = new JButton("Send");
         chatWindow.add(sendButton);
 
-        chatWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        chatWindow.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         chatWindow.setSize(475, 500);
         chatWindow.setVisible(true);
 
         textField.setEditable(false);
         chatArea.setEditable(false);
 
-        sendButton.addActionListener(new Listener());
-        textField.addActionListener(new Listener());
+        sendButton.addActionListener(sendAction);
+        textField.addActionListener(sendAction);
     }
 
     // Startchat
@@ -45,8 +52,10 @@ public class ChatClient {
                 "IP Address Required!", JOptionPane.PLAIN_MESSAGE);
 
         Socket soc = new Socket(ipAddress, 9806);
-        in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
-        out = new PrintWriter(soc.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(soc.getInputStream(), StandardCharsets.UTF_8));
+        
+        out = new PrintWriter(
+                new OutputStreamWriter(soc.getOutputStream(), StandardCharsets.UTF_8), true);
 
         while (true) {
             String str = in.readLine();
@@ -70,12 +79,6 @@ public class ChatClient {
             } else {
                 chatArea.append(str + "\n");
             }
-
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        ChatClient client = new ChatClient();
-        client.startChat();
     }
 }
